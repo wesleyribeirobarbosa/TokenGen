@@ -30,11 +30,12 @@
         android:layout_marginRight="206dp"
         android:layout_marginBottom="551dp"
         android:textAllCaps="true"
-        android:textSize="30dp"
+        android:textSize="60dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:textColor="@color/primaryBlue"/>
 
     <android.support.v7.widget.LinearLayoutCompat
         android:id="@+id/linearLayoutCompat"
@@ -56,14 +57,39 @@
             android:id="@+id/btnGetKey"
             android:layout_width="300dp"
             android:layout_height="wrap_content"
-            android:text="@string/getKeyBtn" />
+            android:text="@string/getKeyBtn"
+            android:textColor="@color/white"
+            android:textAllCaps="true"
+            android:textAppearance="@style/TextAppearance.AppCompat"
+            android:backgroundTint="@color/primaryBlue"/>
 
         <Button
             android:id="@+id/btnResetData"
             android:layout_width="300dp"
             android:layout_height="wrap_content"
-            android:text="@string/resetDataBtn" />
+            android:text="@string/resetDataBtn"
+            android:textColor="@color/white"
+            android:textAllCaps="true"
+            android:textAppearance="@style/TextAppearance.AppCompat"
+            android:backgroundTint="@color/primaryBlue"/>
 
     </android.support.v7.widget.LinearLayoutCompat>
+
+    <TextView
+        android:id="@+id/txtQRCodeReturn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="205dp"
+        android:layout_marginLeft="205dp"
+        android:layout_marginTop="688dp"
+        android:layout_marginEnd="206dp"
+        android:layout_marginRight="206dp"
+        android:layout_marginBottom="16dp"
+        android:textSize="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:hint=""/>
 
 </android.support.constraint.ConstraintLayout>

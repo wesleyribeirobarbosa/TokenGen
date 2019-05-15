@@ -4,9 +4,12 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -20,20 +23,18 @@ import com.google.zxing.integration.android.IntentResult;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
-import java.io.ByteArrayInputStream;
-import java.sql.Array;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.ScheduledExecutorService;
 
 public class MainActivity extends AppCompatActivity{
 
     private Button btnGetKey;
     private Button btnResetData;
-    private TextView txtQRCode;
+    private TextView txtCodeOTP;
+    private TextView txtQRCodeReturn;
     private final Activity activity = this;
     private SharedPreferences sharedPreferences;
     private static int offset = 10;
@@ -55,6 +56,8 @@ public class MainActivity extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ActionBar bar = getSupportActionBar();
+        bar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#144DC7")));
         setTitle("Token Generator");
         sharedPreferences = getSharedPreferences("KEY-TOKEN", Context.MODE_PRIVATE);
         initializeComponents();
@@ -63,6 +66,7 @@ public class MainActivity extends AppCompatActivity{
         if(!key.equals("empty")){
             btnGetKey.setVisibility(View.INVISIBLE);
             btnGetKey.setEnabled(false);
+            txtQRCodeReturn.setText("QR Token: " + key);
             mProgressBar.setVisibility(View.VISIBLE);
             myTimer.scheduleAtFixedRate(new generateOtpToken(), delay, interval);
         }
@@ -76,7 +80,7 @@ public class MainActivity extends AppCompatActivity{
                 prgss++;
                 mProgressBar.setProgress((int)prgss*100/(30000/1000));
                 if((int)prgss*100/(30000/1000)==80){
-                    txtQRCode.setTextColor(getResources().getColor(R.color.redAlert));
+                    txtCodeOTP.setTextColor(getResources().getColor(R.color.redAlert));
                 }
             }
 
@@ -92,6 +96,7 @@ public class MainActivity extends AppCompatActivity{
     private void initializeComponents() {
 
         initCountDownTimer();
+        txtQRCodeReturn = (TextView) findViewById(R.id.txtQRCodeReturn);
         mProgressBar=(ProgressBar)findViewById(R.id.progressbar);
         mProgressBar.setProgress(prgss);
         btnGetKey = (Button) findViewById(R.id.btnGetKey);
@@ -114,14 +119,14 @@ public class MainActivity extends AppCompatActivity{
                 editor.apply();
                 btnGetKey.setEnabled(true);
                 btnGetKey.setVisibility(View.VISIBLE);
-                txtQRCode.setText("");
+                txtCodeOTP.setText("");
                 prgss=0;
                 mCountDownTimer.cancel();
                 mProgressBar.setVisibility(View.INVISIBLE);
                 myTimer.cancel();
             }
         });
-        txtQRCode = (TextView) findViewById(R.id.txtQRCode);
+        txtCodeOTP = (TextView) findViewById(R.id.txtQRCode);
     }
 
     @Override
@@ -134,10 +139,10 @@ public class MainActivity extends AppCompatActivity{
                     mProgressBar.setVisibility(View.VISIBLE);
                     myTimer = new Timer();
                     JSONObject scanQR = new JSONObject(result.getContents());
-                    key  = scanQR.getString("key");
-                    txtQRCode.setText(key);
+                    key = scanQR.getString("key");
+                    txtQRCodeReturn.setText("QR Token: " + key);
                     prgss=0;
-                    txtQRCode.setTextColor(getResources().getColor(R.color.colorPrimary));
+                    txtCodeOTP.setTextColor(getResources().getColor(R.color.gray));
                     mCountDownTimer.start();
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString("KEY-TOKEN",key);
@@ -184,9 +189,10 @@ public class MainActivity extends AppCompatActivity{
             final String otpFinalCode = decimalCodeString.substring(decimalCodeString.length() - 6, decimalCodeString.length());
             handler.post(new Runnable() {
                 public void run() {
-                    txtQRCode.setText(otpFinalCode);
+                    txtCodeOTP.setText(otpFinalCode);
                     prgss=0;
-                    txtQRCode.setTextColor(getResources().getColor(R.color.colorPrimary));
+                    txtQRCodeReturn.setText("QR Token: " + key);
+                    txtCodeOTP.setTextColor(getResources().getColor(R.color.gray));
                     mCountDownTimer.cancel();
                     initCountDownTimer();
                     mCountDownTimer.start();
