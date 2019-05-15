@@ -8,7 +8,7 @@
   ((void)__android_log_print(ANDROID_LOG_DEBUG, "EncryptionLib-JNI", __VA_ARGS__))
 
 
-extern "C" JNIEXPORT jstring JNICALL
+extern "C" JNIEXPORT jbyteArray JNICALL
 Java_com_wesley_tokengenerator_MainActivity_generateOtp(JNIEnv *env, jobject thiz, jstring key) {
 
     const char *constKeyLocal = env->GetStringUTFChars(key, 0);
@@ -33,7 +33,5 @@ Java_com_wesley_tokengenerator_MainActivity_generateOtp(JNIEnv *env, jobject thi
     free(digest);
     free(keyLocal);
 
-   /* return digestByteArray;*/
-    std::string hello = "IT WORKS";
-    return env->NewStringUTF(hello.c_str());
+   return digestByteArray;
 }

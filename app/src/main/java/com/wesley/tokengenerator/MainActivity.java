@@ -18,6 +18,10 @@ import com.google.zxing.integration.android.IntentResult;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayInputStream;
+import java.sql.Array;
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity {
 
     private Button btnGetKey;
@@ -25,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView txtQRCode;
     private final Activity activity = this;
     private SharedPreferences sharedPreferences;
+    private static int offset = 10;
 
     //Carrega a Lib responsável pela chamada do método de geração do Hash
     static {
@@ -88,6 +93,10 @@ public class MainActivity extends AppCompatActivity {
                     editor.apply();
                     btnGetKey.setEnabled(false);
                     btnGetKey.setVisibility(View.INVISIBLE);
+                    byte[] byteArray = generateOtp(key);
+                    byte baitin = byteArray[10];
+                    String teste = Integer.toString(byteArray[10]) + " " + Integer.toString(byteArray[11]) + " " + Integer.toString(byteArray[12])+ " " + Integer.toString(byteArray[13]);
+                    txtQRCode.setText(teste);
                 } catch (JSONException e) {
                     e.printStackTrace();
                     Alert("Erro ao interpretar código!");
@@ -108,5 +117,5 @@ public class MainActivity extends AppCompatActivity {
      * A native method that is implemented by the 'otpjni' library,
      * which is packaged with this application.
      */
-    public native String generateOtp(String key);
+    public native byte[] generateOtp(String key);
 }
