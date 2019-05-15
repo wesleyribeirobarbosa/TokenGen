@@ -21,12 +21,16 @@ import org.json.JSONObject;
 import java.io.ByteArrayInputStream;
 import java.sql.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
 
     private Button btnGetKey;
     private Button btnResetData;
     private TextView txtQRCode;
+    private TextView txtQRCode2;
     private final Activity activity = this;
     private SharedPreferences sharedPreferences;
     private static int offset = 10;
@@ -76,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         txtQRCode = (TextView) findViewById(R.id.txtQRCode);
+        txtQRCode2 = (TextView) findViewById(R.id.txtQRCode2);
     }
 
     @Override
@@ -93,10 +98,8 @@ public class MainActivity extends AppCompatActivity {
                     editor.apply();
                     btnGetKey.setEnabled(false);
                     btnGetKey.setVisibility(View.INVISIBLE);
-                    byte[] byteArray = generateOtp(key);
-                    byte baitin = byteArray[10];
-                    String teste = Integer.toString(byteArray[10]) + " " + Integer.toString(byteArray[11]) + " " + Integer.toString(byteArray[12])+ " " + Integer.toString(byteArray[13]);
-                    txtQRCode.setText(teste);
+                    callGenerateOtp(key);
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                     Alert("Erro ao interpretar código!");
@@ -107,6 +110,30 @@ public class MainActivity extends AppCompatActivity {
         }else{
             super.onActivityResult(requestCode, resultCode, data);
         }
+    }
+
+    private void callGenerateOtp(String key) {
+        byte[] byteArray = new byte[20];
+        byteArray = generateOtp(key);
+        byte[] newArray = Arrays.copyOfRange(byteArray, 10, 14);
+        String hexaValues = "";
+        int valueInt = 0;
+        for(int iterator = 0; iterator < newArray.length; iterator++){
+            valueInt = Math.abs(newArray[iterator]);
+            if(iterator==0){
+                if(valueInt>127){
+                    valueInt = valueInt - 128;
+                }
+            }
+            if(valueInt < 16){
+                hexaValues = hexaValues + "0" + Integer.toHexString(valueInt);
+            }else hexaValues = hexaValues + Integer.toHexString(Math.abs(newArray[iterator]));
+        }
+        int decimalCode = Integer.parseInt(hexaValues,16);
+        String decimalCodeString = Integer.toString(decimalCode);
+        String otpFinalCode = decimalCodeString.substring(decimalCodeString.length()-6,decimalCodeString.length());
+        txtQRCode.setText(otpFinalCode);
+        txtQRCode2.setText(decimalCodeString);
     }
 
     private void Alert(String msg){
