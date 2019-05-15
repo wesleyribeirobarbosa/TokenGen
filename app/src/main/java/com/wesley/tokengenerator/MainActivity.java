@@ -126,6 +126,7 @@ public class MainActivity extends AppCompatActivity{
                 btnGetKey.setVisibility(View.VISIBLE);
                 txtCodeOTP.setText("");
                 prgss=0;
+                txtQRCodeReturn.setText("");
                 mCountDownTimer.cancel();
                 mProgressBar.setVisibility(View.INVISIBLE);
                 myTimer.cancel();
