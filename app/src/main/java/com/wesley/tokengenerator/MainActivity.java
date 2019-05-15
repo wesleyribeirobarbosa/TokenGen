@@ -4,11 +4,14 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.CountDownTimer;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,16 +27,24 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ScheduledExecutorService;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity{
 
     private Button btnGetKey;
     private Button btnResetData;
     private TextView txtQRCode;
-    private TextView txtQRCode2;
     private final Activity activity = this;
     private SharedPreferences sharedPreferences;
     private static int offset = 10;
+    private String key;
+    int delay = 0;   // delay de 1 seg.
+    int interval = 30000;  // intervalo de 1 seg.
+    Handler handler = new Handler();
+    private Timer myTimer = new Timer();
+    private ProgressBar mProgressBar;
+    private CountDownTimer mCountDownTimer;
+    private int prgss=0;
 
     //Carrega a Lib responsável pela chamada do método de geração do Hash
     static {
@@ -44,18 +55,45 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        setTitle("Token Generator");
         sharedPreferences = getSharedPreferences("KEY-TOKEN", Context.MODE_PRIVATE);
         initializeComponents();
-        String keyToken = sharedPreferences.getString("KEY-TOKEN", "empty");
-        if(!keyToken.equals("empty")){
+        mProgressBar.setVisibility(View.INVISIBLE);
+        key = sharedPreferences.getString("KEY-TOKEN", "empty");
+        if(!key.equals("empty")){
             btnGetKey.setVisibility(View.INVISIBLE);
             btnGetKey.setEnabled(false);
-            txtQRCode.setText(keyToken);
+            mProgressBar.setVisibility(View.VISIBLE);
+            myTimer.scheduleAtFixedRate(new generateOtpToken(), delay, interval);
         }
+    }
+
+    private void initCountDownTimer(){
+        mCountDownTimer=new CountDownTimer(30000,1000) {
+
+            @Override
+            public void onTick(long millisUntilFinished) {
+                prgss++;
+                mProgressBar.setProgress((int)prgss*100/(30000/1000));
+                if((int)prgss*100/(30000/1000)==80){
+                    txtQRCode.setTextColor(getResources().getColor(R.color.redAlert));
+                }
+            }
+
+            @Override
+            public void onFinish() {
+                //Do what you want
+                prgss++;
+                mProgressBar.setProgress(100);
+            }
+        };
     }
 
     private void initializeComponents() {
 
+        initCountDownTimer();
+        mProgressBar=(ProgressBar)findViewById(R.id.progressbar);
+        mProgressBar.setProgress(prgss);
         btnGetKey = (Button) findViewById(R.id.btnGetKey);
         btnGetKey.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -77,10 +115,13 @@ public class MainActivity extends AppCompatActivity {
                 btnGetKey.setEnabled(true);
                 btnGetKey.setVisibility(View.VISIBLE);
                 txtQRCode.setText("");
+                prgss=0;
+                mCountDownTimer.cancel();
+                mProgressBar.setVisibility(View.INVISIBLE);
+                myTimer.cancel();
             }
         });
         txtQRCode = (TextView) findViewById(R.id.txtQRCode);
-        txtQRCode2 = (TextView) findViewById(R.id.txtQRCode2);
     }
 
     @Override
@@ -90,15 +131,20 @@ public class MainActivity extends AppCompatActivity {
         if(result != null){
             if(result.getContents() != null){
                 try {
+                    mProgressBar.setVisibility(View.VISIBLE);
+                    myTimer = new Timer();
                     JSONObject scanQR = new JSONObject(result.getContents());
-                    String key  = scanQR.getString("key");
+                    key  = scanQR.getString("key");
                     txtQRCode.setText(key);
+                    prgss=0;
+                    txtQRCode.setTextColor(getResources().getColor(R.color.colorPrimary));
+                    mCountDownTimer.start();
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString("KEY-TOKEN",key);
                     editor.apply();
                     btnGetKey.setEnabled(false);
                     btnGetKey.setVisibility(View.INVISIBLE);
-                    callGenerateOtp(key);
+                    myTimer.scheduleAtFixedRate(new generateOtpToken(), delay, interval);
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -112,28 +158,42 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void callGenerateOtp(String key) {
-        byte[] byteArray = new byte[20];
-        byteArray = generateOtp(key);
-        byte[] newArray = Arrays.copyOfRange(byteArray, 10, 14);
-        String hexaValues = "";
-        int valueInt = 0;
-        for(int iterator = 0; iterator < newArray.length; iterator++){
-            valueInt = Math.abs(newArray[iterator]);
-            if(iterator==0){
-                if(valueInt>127){
-                    valueInt = valueInt - 128;
+    private class generateOtpToken extends TimerTask  {
+
+        public void run() {
+            // colocar tarefas aqui ...
+            byte[] byteArray = new byte[20];
+            byteArray = generateOtp(key);
+            byte[] newArray = Arrays.copyOfRange(byteArray, 10, 14);
+            String hexaValues = "";
+            int valueInt = 0;
+            for (int iterator = 0; iterator < newArray.length; iterator++) {
+                valueInt = Math.abs(newArray[iterator]);
+                if (iterator == 0) {
+                    if (valueInt > 127) {
+                        valueInt = valueInt - 128;
+                    }
                 }
+                if (valueInt < 16) {
+                    hexaValues = hexaValues + "0" + Integer.toHexString(valueInt);
+                } else
+                    hexaValues = hexaValues + Integer.toHexString(Math.abs(newArray[iterator]));
             }
-            if(valueInt < 16){
-                hexaValues = hexaValues + "0" + Integer.toHexString(valueInt);
-            }else hexaValues = hexaValues + Integer.toHexString(Math.abs(newArray[iterator]));
+            int decimalCode = Integer.parseInt(hexaValues, 16);
+            final String decimalCodeString = Integer.toString(decimalCode);
+            final String otpFinalCode = decimalCodeString.substring(decimalCodeString.length() - 6, decimalCodeString.length());
+            handler.post(new Runnable() {
+                public void run() {
+                    txtQRCode.setText(otpFinalCode);
+                    prgss=0;
+                    txtQRCode.setTextColor(getResources().getColor(R.color.colorPrimary));
+                    mCountDownTimer.cancel();
+                    initCountDownTimer();
+                    mCountDownTimer.start();
+                }
+            });
         }
-        int decimalCode = Integer.parseInt(hexaValues,16);
-        String decimalCodeString = Integer.toString(decimalCode);
-        String otpFinalCode = decimalCodeString.substring(decimalCodeString.length()-6,decimalCodeString.length());
-        txtQRCode.setText(otpFinalCode);
-        txtQRCode2.setText(decimalCodeString);
+
     }
 
     private void Alert(String msg){
