@@ -1,6 +1,8 @@
 package com.wesley.tokengenerator;
 
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -8,9 +10,13 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.CountDownTimer;
 import android.os.Handler;
-import android.support.annotation.Nullable;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.biometric.BiometricPrompt;
+
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -23,11 +29,11 @@ import com.google.zxing.integration.android.IntentResult;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Executor;
 
 public class MainActivity extends AppCompatActivity{
 
@@ -46,12 +52,12 @@ public class MainActivity extends AppCompatActivity{
     int delay = 0;   // delay nulo pra chamada do GenerateOtp.
     int interval = 30000;  // intervalo de 30 segundos.
 
-    Handler handler = new Handler();
-
     //Carrega a Lib responsável pela chamada do método de geração do Hash
     {
         System.loadLibrary("otpjni");
     }
+
+    private Handler handler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

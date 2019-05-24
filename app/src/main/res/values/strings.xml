@@ -8,4 +8,5 @@
     <string name="qrReadLabel">Aponte a Câmera para o QR Code</string>
     <string name="errorReadQR">Erro ao interpretar código!</string>
     <string name="readCanceled">Leitura Cancelada!</string>
+    <string name="enterBtn">Acessar</string>
 </resources>
