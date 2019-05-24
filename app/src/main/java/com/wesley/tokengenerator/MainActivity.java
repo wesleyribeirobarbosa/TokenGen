@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ActionBar bar = getSupportActionBar();
-        bar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#144DC7")));
+        bar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#1EA1FF")));
         setTitle("Token Generator");
         //Shared Preferences utilizado para armazenar o QR Token
         sharedPreferences = getSharedPreferences("KEY-TOKEN", Context.MODE_PRIVATE);
