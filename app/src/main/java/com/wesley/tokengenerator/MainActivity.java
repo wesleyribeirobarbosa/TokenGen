@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity{
     private Button btnResetData;
     private TextView txtCodeOTP;
     private TextView txtQRCodeReturn;
-    private final Activity activity = this;
+    private Activity activity = this;
     private SharedPreferences sharedPreferences;
     private String key;
     private Timer myTimer = new Timer();
@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity{
     Handler handler = new Handler();
 
     //Carrega a Lib responsável pela chamada do método de geração do Hash
-    static {
+    {
         System.loadLibrary("otpjni");
     }
 
@@ -59,18 +59,18 @@ public class MainActivity extends AppCompatActivity{
         setContentView(R.layout.activity_main);
         ActionBar bar = getSupportActionBar();
         bar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#1EA1FF")));
-        setTitle("Token Generator");
+        setTitle(getApplicationContext().getResources().getString(R.string.name));
         //Shared Preferences utilizado para armazenar o QR Token
-        sharedPreferences = getSharedPreferences("KEY-TOKEN", Context.MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences(getApplicationContext().getResources().getString(R.string.sharedPreferencesName), Context.MODE_PRIVATE);
         //Inicialização dos componentes da UI
         initializeComponents();
         mProgressBar.setVisibility(View.INVISIBLE);
-        key = sharedPreferences.getString("KEY-TOKEN", "empty");
+        key = sharedPreferences.getString(getApplicationContext().getResources().getString(R.string.sharedPreferencesName), "empty");
         //Verifica se existe um QR Token armazenado para iniciar a geração do OTP Code ou não.
         if(!key.equals("empty")){
             btnGetKey.setVisibility(View.INVISIBLE);
             btnGetKey.setEnabled(false);
-            txtQRCodeReturn.setText("QR Token: " + key);
+            txtQRCodeReturn.setText(activity.getResources().getString(R.string.qrTokenLabel) + " " + key);
             mProgressBar.setVisibility(View.VISIBLE);
             //Como existe um QR Token armazenado, já inicia a aplicação com a chamada temporizada da geração do OTP Code
             myTimer.scheduleAtFixedRate(new generateOtpToken(), delay, interval);
@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity{
             public void onClick(View v) {
                 IntentIntegrator integrator = new IntentIntegrator(activity);
                 integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE_TYPES);
-                integrator.setPrompt("Camera Scan");
+                integrator.setPrompt("");
                 integrator.setCameraId(0);
                 integrator.initiateScan();
             }
@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity{
             public void onClick(View v) {
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 //Seta QR Token como vazio para forçar a exigência de nova leitura do QR Code
-                editor.putString("KEY-TOKEN","empty");
+                editor.putString(activity.getResources().getString(R.string.sharedPreferencesName),"empty");
                 editor.apply();
                 btnGetKey.setEnabled(true);
                 btnGetKey.setVisibility(View.VISIBLE);
@@ -146,12 +146,12 @@ public class MainActivity extends AppCompatActivity{
                     myTimer = new Timer();
                     JSONObject scanQR = new JSONObject(result.getContents());
                     key = scanQR.getString("key");
-                    txtQRCodeReturn.setText("QR Token: " + key);
+                    txtQRCodeReturn.setText(activity.getResources().getString(R.string.qrTokenLabel) + " " + key);
                     prgss=0;
                     txtCodeOTP.setTextColor(getResources().getColor(R.color.gray));
                     mCountDownTimer.start();
                     SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putString("KEY-TOKEN",key);
+                    editor.putString(activity.getResources().getString(R.string.sharedPreferencesName),"empty");
                     editor.apply();
                     btnGetKey.setEnabled(false);
                     btnGetKey.setVisibility(View.INVISIBLE);
@@ -160,10 +160,10 @@ public class MainActivity extends AppCompatActivity{
 
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    Alert("Erro ao interpretar código!");
+                    Alert(activity.getResources().getString(R.string.errorReadQR));
                 }
             }else{
-                Alert("Leitura Cancelada!");
+                Alert(activity.getResources().getString(R.string.readCanceled));
             }
         }else{
             super.onActivityResult(requestCode, resultCode, data);
@@ -212,7 +212,7 @@ public class MainActivity extends AppCompatActivity{
                 public void run() {
                     txtCodeOTP.setText(otpFinalCode);
                     prgss=0;
-                    txtQRCodeReturn.setText("QR Token: " + key);
+                    txtQRCodeReturn.setText(activity.getResources().getString(R.string.qrTokenLabel) + " " + key);
                     txtCodeOTP.setTextColor(getResources().getColor(R.color.gray));
                     mCountDownTimer.cancel();
                     initCountDownTimer();

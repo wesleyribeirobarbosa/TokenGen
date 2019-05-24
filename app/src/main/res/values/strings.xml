@@ -2,4 +2,10 @@
     <string name="app_name">Token</string>
     <string name="getKeyBtn">Get Key</string>
     <string name="resetDataBtn">Reset Data</string>
+    <string name="name">Token Generator</string>
+    <string name="sharedPreferencesName">KEY-TOKEN</string>
+    <string name="qrTokenLabel">QR Token:</string>
+    <string name="qrReadLabel">Aponte a Câmera para o QR Code</string>
+    <string name="errorReadQR">Erro ao interpretar código!</string>
+    <string name="readCanceled">Leitura Cancelada!</string>
 </resources>
