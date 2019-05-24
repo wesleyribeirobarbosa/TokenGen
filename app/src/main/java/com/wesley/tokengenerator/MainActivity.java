@@ -157,7 +157,7 @@ public class MainActivity extends AppCompatActivity{
                     txtCodeOTP.setTextColor(getResources().getColor(R.color.gray));
                     mCountDownTimer.start();
                     SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putString(activity.getResources().getString(R.string.sharedPreferencesName),"empty");
+                    editor.putString(activity.getResources().getString(R.string.sharedPreferencesName),key);
                     editor.apply();
                     btnGetKey.setEnabled(false);
                     btnGetKey.setVisibility(View.INVISIBLE);

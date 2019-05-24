@@ -5,22 +5,18 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.biometric.BiometricPrompt;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
 import java.util.concurrent.Executor;
 
-public class LoginActivity extends AppCompatActivity {
+public class AuthenticationActivity extends AppCompatActivity {
 
     private Button btnGetAccess;
 
@@ -41,6 +37,7 @@ public class LoginActivity extends AppCompatActivity {
         bar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#1EA1FF")));
         setTitle(getApplicationContext().getResources().getString(R.string.name));
         initComponents();
+        showBiometricPrompt();
 
     }
 
@@ -63,19 +60,15 @@ public class LoginActivity extends AppCompatActivity {
                         .setNegativeButtonText("Cancelar")
                         .build();
 
-        BiometricPrompt biometricPrompt = new BiometricPrompt(LoginActivity.this,
+        BiometricPrompt biometricPrompt = new BiometricPrompt(AuthenticationActivity.this,
                 executor, new BiometricPrompt.AuthenticationCallback() {
             @Override
             public void onAuthenticationError(int errorCode,
                                               @NonNull CharSequence errString) {
                 super.onAuthenticationError(errorCode, errString);
                 Toast.makeText(getApplicationContext(),
-                        "Erro de Autenticação: " + errString, Toast.LENGTH_SHORT)
+                        "" + errString, Toast.LENGTH_SHORT)
                         .show();
-                //Mata todos processos associados a este aplicativo.
-                android.os.Process.killProcess(android.os.Process.myPid());
-                //Fecha o aplicativo.
-                System.exit(1);
             }
 
             @Override
@@ -84,7 +77,7 @@ public class LoginActivity extends AppCompatActivity {
                 super.onAuthenticationSucceeded(result);
                 BiometricPrompt.CryptoObject authenticatedCryptoObject =
                         result.getCryptoObject();
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                Intent intent = new Intent(AuthenticationActivity.this, MainActivity.class);
                 startActivity(intent);
             }
 
