@@ -83,6 +83,10 @@ public class MainActivity extends AppCompatActivity{
         }
     }
 
+    @Override
+    public void onBackPressed() {
+    }
+
     //Metodo responsável pelo incremento da barra que demonstra o tempo restante para atualização do OTP Code
     private void initCountDownTimer(){
         mCountDownTimer=new CountDownTimer(30000,1000) {
