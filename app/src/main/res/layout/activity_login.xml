@@ -23,7 +23,7 @@
 
     <Button
         android:id="@+id/btnGetAccess"
-        android:layout_width="170dp"
+        android:layout_width="190dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="120dp"
         android:layout_marginLeft="120dp"

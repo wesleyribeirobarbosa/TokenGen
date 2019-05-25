@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Token</string>
-    <string name="getKeyBtn">Get Key</string>
-    <string name="resetDataBtn">Reset Data</string>
+    <string name="getKeyBtn">Obter chave</string>
+    <string name="resetDataBtn">Limpar dados</string>
     <string name="name">Token Generator</string>
     <string name="sharedPreferencesName">KEY-TOKEN</string>
     <string name="qrTokenLabel">QR Token:</string>
